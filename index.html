@@ -2,130 +2,197 @@
 <html lang="cs">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>K&D Minibar Management</title>
     <style>
-        :root {
-            --primary-color: #FF385C;
-            --secondary-color: #00A699;
-            --background-color: #F7F7F7;
-            --text-color: #484848;
-            --oh-yeah-bg: #FFC0CB;
-            --little-castle-bg: #ADD8E6;
-            --amazing-pool-bg: #90EE90;
-        }
-
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Circular', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        }
-
-        html, body {
-            background-color: var(--background-color);
+            box-sizing: border-box;
         }
 
         body {
-            overflow-y: scroll;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.5;
         }
 
-        .app-container {
-            max-width: 600px;
+        .container {
+            max-width: 800px;
             margin: 20px auto;
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background: linear-gradient(135deg, #FF385C, #00A699);
+            color: white;
             padding: 20px;
             text-align: center;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 10px 10px 0 0;
+            border-radius: 8px 8px 0 0;
+            margin: -20px -20px 20px -20px;
         }
 
-        .content {
-            padding: 20px;
+        .villa-oh-yeah { background: linear-gradient(135deg, #FF385C, #FF8B3D); }
+        .villa-little-castle { background: linear-gradient(135deg, #4A90E2, #357ABD); }
+        .villa-amazing-pool { background: linear-gradient(135deg, #50E3C2, #00A699); }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
         }
 
         .form-group {
             margin-bottom: 15px;
         }
 
-        input, select {
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        select, input {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
+            padding: 8px 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
+            font-size: 16px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #FF385C;
         }
 
         .section-title {
             font-size: 18px;
-            margin-top: 20px;
-            font-weight: bold;
-            color: var(--primary-color);
+            color: #FF385C;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #FF385C;
         }
 
-        .btn {
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .currency-toggle {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .currency-toggle button {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .currency-toggle button.active {
+            background: #FF385C;
+            color: white;
+            border-color: #FF385C;
+        }
+
+        button {
             width: 100%;
-            padding: 10px;
-            margin-top: 15px;
-            background: var(--primary-color);
+            padding: 12px;
+            background: #FF385C;
             color: white;
             border: none;
+            border-radius: 4px;
             font-size: 16px;
             font-weight: bold;
-            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: background-color 0.2s;
+            margin-top: 20px;
         }
 
-        .btn:hover {
-            background: var(--secondary-color);
+        button:hover {
+            background: #E61E4D;
         }
 
         .invoice {
-            background-color: #F9F9F9;
-            border-radius: 8px;
-            padding: 20px;
             margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .invoice-items {
+            margin: 20px 0;
         }
 
         .invoice-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #DBDBDB;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .invoice-item.purchased {
+            background-color: #f0f0f0;
         }
 
         .invoice-total {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #dee2e6;
             font-weight: bold;
             text-align: right;
-            padding-top: 15px;
+            font-size: 18px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            .header {
+                margin: -15px -15px 15px -15px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="app-container" id="appContainer">
-        <div class="header">K&D Minibar Management</div>
+    <div class="container">
+        <div class="header" id="headerGradient">
+            <h1>K&D Minibar Management</h1>
+        </div>
 
-        <div class="content">
-            <div class="form-group">
-                <label for="villa">Výběr vily</label>
-                <select id="villa" onchange="updateVillaSettings()">
-                    <option value="oh-yeah">OH YEAH VILLA</option>
-                    <option value="little-castle">LITTLE CASTLE</option>
-                    <option value="amazing-pool">AMAZING POOL</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label for="villa">Výběr vily</label>
+            <select id="villa" onchange="updateVillaSettings()">
+                <option value="oh-yeah">OH YEAH VILLA</option>
+                <option value="little-castle">LITTLE CASTLE</option>
+                <option value="amazing-pool">AMAZING POOL</option>
+            </select>
+        </div>
 
+        <div class="grid">
             <div class="form-group">
                 <label for="exchange-rate">Aktuální kurz CZK/EUR</label>
                 <input type="number" id="exchange-rate" placeholder="Zadejte kurz" step="0.1" required>
@@ -140,79 +207,184 @@
                 <label for="nights">Počet nocí</label>
                 <input type="number" id="nights" placeholder="Počet nocí" min="1" required>
             </div>
+        </div>
 
-            <div class="section-title">Položky v CZK</div>
+        <div class="section-title">Položky v CZK</div>
+        <div class="grid">
             <div class="form-group">
                 <label for="budvar">Budvar (59 Kč)</label>
                 <input type="number" id="budvar" placeholder="0" min="0">
             </div>
+
             <div class="form-group">
                 <label for="malibu">Malibu (99 Kč)</label>
                 <input type="number" id="malibu" placeholder="0" min="0">
             </div>
+
             <div class="form-group">
                 <label for="jack-cola">Jack s colou (99 Kč)</label>
                 <input type="number" id="jack-cola" placeholder="0" min="0">
             </div>
+
             <div class="form-group">
                 <label for="moscow-mule">Moscow Mule (99 Kč)</label>
                 <input type="number" id="moscow-mule" placeholder="0" min="0">
             </div>
+
             <div class="form-group">
                 <label for="gin-tonic">Gin-Tonic (99 Kč)</label>
                 <input type="number" id="gin-tonic" placeholder="0" min="0">
             </div>
+
             <div class="form-group">
                 <label for="mojito">Mojito (99 Kč)</label>
                 <input type="number" id="mojito" placeholder="0" min="0">
             </div>
-            <div id="amazing-pool-items" style="display: none;">
+
+            <div class="form-group">
+                <label for="prosecco">Prosecco (390 Kč)</label>
+                <input type="number" id="prosecco" placeholder="0" min="0">
+            </div>
+        </div>
+
+        <div id="extra-items" style="display: none;">
+            <div class="grid">
                 <div class="form-group">
                     <label for="coca-cola">Coca-Cola (32 Kč)</label>
                     <input type="number" id="coca-cola" placeholder="0" min="0">
                 </div>
+
                 <div class="form-group">
                     <label for="sprite">Sprite (32 Kč)</label>
                     <input type="number" id="sprite" placeholder="0" min="0">
                 </div>
+
                 <div class="form-group">
                     <label for="red-bull">Red Bull (59 Kč)</label>
                     <input type="number" id="red-bull" placeholder="0" min="0">
                 </div>
             </div>
-            <div class="form-group">
-                <label for="prosecco">Prosecco (390 Kč)</label>
-                <input type="number" id="prosecco" placeholder="0" min="0">
-            </div>
+        </div>
 
-            <div class="section-title">Položky v EUR</div>
+        <div class="section-title">Položky v EUR</div>
+        <div class="grid">
             <div class="form-group">
                 <label for="beer-30l">Pivo sud 30 l (125 €)</label>
                 <input type="number" id="beer-30l" placeholder="0" min="0">
             </div>
+
             <div class="form-group">
                 <label for="beer-50l">Pivo sud 50 l (175 €)</label>
                 <input type="number" id="beer-50l" placeholder="0" min="0">
             </div>
+
             <div class="form-group">
                 <label for="gas">Plyn (12 €)</label>
                 <input type="number" id="gas" placeholder="0" min="0">
             </div>
+
             <div class="form-group">
                 <label for="wellness">Wellness (€)</label>
-                <input type="number" id="wellness" placeholder="Cena zadaná uživatelem" min="0">
+                <input type="number" id="wellness" placeholder="Cena" min="0">
             </div>
-
-            <button class="btn" onclick="generateInvoice()">Generovat fakturu</button>
-            <div id="invoiceContainer"></div>
         </div>
+
+        <div class="currency-toggle">
+            <button onclick="setCurrency('CZK')" id="czk-btn" class="active">Zobrazit v CZK</button>
+            <button onclick="setCurrency('EUR')" id="eur-btn">Zobrazit v EUR</button>
+        </div>
+
+        <button onclick="generateInvoice()">Generovat fakturu</button>
+        <div id="invoiceContainer"></div>
     </div>
 
     <script>
+        let currentVilla = "oh-yeah";
+        let selectedCurrency = "CZK";
+
         function updateVillaSettings() {
             const villa = document.getElementById("villa").value;
-            const appContainer = document.getElementById("appContainer");
-            const amazingPoolItems = document.getElementById("amazing-pool-items");
+            const extraItems = document.getElementById("extra-items");
+            const header = document.getElementById("headerGradient");
 
-            if (villa === "oh-yeah") {
-                appContainer.style.background
+            // Aktualizace vily
+            currentVilla = villa;
+
+            // Zobrazení/skrytí extra položek
+            if (villa === "amazing-pool") {
+                extraItems.style.display = "block";
+            } else {
+                extraItems.style.display = "none";
+            }
+
+            // Aktualizace barvy hlavičky
+            header.className = "header villa-" + villa;
+        }
+
+        function setCurrency(currency) {
+            selectedCurrency = currency;
+            document.getElementById("czk-btn").classList.toggle("active", currency === "CZK");
+            document.getElementById("eur-btn").classList.toggle("active", currency === "EUR");
+            if (document.getElementById("invoiceContainer").innerHTML) {
+                generateInvoice(); // Přegenerovat fakturu při změně měny
+            }
+        }
+
+        function formatNumber(number, currency) {
+            return new Intl.NumberFormat('cs-CZ', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(number) + (currency === "CZK" ? " Kč" : " €");
+        }
+
+        function getCurrentDate() {
+            const today = new Date();
+            return today.getDate() + ". " + (today.getMonth() + 1) + ". " + today.getFullYear();
+        }
+
+        function generateInvoice() {
+            // Základní údaje
+            const guests = parseInt(document.getElementById("guests").value) || 0;
+            const nights = parseInt(document.getElementById("nights").value) || 0;
+            const exchangeRate = parseFloat(document.getElementById("exchange-rate").value) || 0;
+            const cityTax = guests * nights * 2;
+
+            // CZK položky a jejich ceny
+            const czItems = {
+                'budvar': { price: 59, label: 'Budvar' },
+                'malibu': { price: 99, label: 'Malibu' },
+                'jack-cola': { price: 99, label: 'Jack s colou' },
+                'moscow-mule': { price: 99, label: 'Moscow Mule' },
+                'gin-tonic': { price: 99, label: 'Gin-Tonic' },
+                'mojito': { price: 99, label: 'Mojito' },
+                'coca-cola': { price: 32, label: 'Coca-Cola' },
+                'sprite': { price: 32, label: 'Sprite' },
+                'red-bull': { price: 59, label: 'Red Bull' },
+                'prosecco': { price: 390, label: 'Prosecco' }
+            };
+
+            // EUR položky a jejich ceny
+            const eurItems = {
+                'beer-30l': { price: 125, label: 'Pivo sud 30l' },
+                'beer-50l': { price: 175, label: 'Pivo sud 50l' },
+                'gas': { price: 12, label: 'Plyn' }
+            };
+
+            // Inicializace celkových sum
+            let totalCZK = 0;
+            let itemsHtml = '';
+
+            // Zpracování CZK položek
+            for (const [id, item] of Object.entries(czItems)) {
+                const quantity = parseInt(document.getElementById(id)?.value) || 0;
+                if (quantity > 0) {
+                    const itemTotal = quantity * item.price;
+                    totalCZK += itemTotal;
+                    const eurValue = itemTotal / exchangeRate;
+                    itemsHtml += `
+                        <div class="invoice-item purchased">
+                            <span>${item.label} (${quantity}x)</span>
+                            <span>${selectedCurrency === "CZK" ? 
+                                formatNumber(itemTotal, "CZK") : 
+                                formatNumber(eurValue, "EUR")}</span>
+                        </div>`;
