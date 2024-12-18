@@ -140,6 +140,12 @@
             font-weight: bold;
             color: var(--primary-color);
         }
+
+        @media print {
+            .btn {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -177,7 +183,6 @@
             </div>
 
             <div class="section-title">Položky v CZK</div>
-            <!-- Položky v CZK: Budvar, Malibu, Jack s colou, Moscow Mule, Gin-Tonic, Mojito, Coca-Cola, Sprite, Red Bull, Prosecco -->
             <div class="form-group">
                 <label for="budvar">Budvar (59 Kč)</label>
                 <input type="number" id="budvar" placeholder="0" min="0">
@@ -220,7 +225,6 @@
             </div>
 
             <div class="section-title">Položky v EUR</div>
-            <!-- Položky v EUR: Pivo sud 30l, Pivo sud 50l, Plyn, Wellness -->
             <div class="form-group">
                 <label for="beer-30l">Pivo sud 30l (125 €)</label>
                 <input type="number" id="beer-30l" placeholder="0" min="0">
@@ -250,6 +254,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
+        let currentInvoiceHTML = '';
+
         function changeVillaStyle() {
             const villa = document.getElementById('villa').value;
             const appContainer = document.getElementById('appContainer');
@@ -302,8 +308,7 @@
             eurItems.forEach(item => {
                 const qty = parseInt(document.getElementById(item.id).value,10) || 0;
                 if(item.priceVariable) {
-                    // wellness zadána přímo hodnota v EUR
-                    totalEUR += qty;
+                    totalEUR += qty; 
                 } else {
                     totalEUR += qty * item.price;
                 }
@@ -322,7 +327,8 @@
                 finalText = "Celková částka: " + finalAmount.toFixed(2) + " CZK";
             }
 
-            let invoiceHTML = '<div class="invoice">';
+            // Generování HTML faktury
+            let invoiceHTML = '<div class="invoice" id="invoicePrint">';
             invoiceHTML += '<h3>Faktura</h3>';
             invoiceHTML += '<div class="invoice-item"><span>Vila: '+villaName+'</span></div>';
             invoiceHTML += '<div class="invoice-item"><span>Datum: '+new Date().toLocaleDateString()+'</span></div>';
@@ -355,33 +361,49 @@
             });
 
             invoiceHTML += '<div class="invoice-total">'+finalText+'</div>';
-            invoiceHTML += '<button class="btn" onclick="generatePDF(\''+villaName+'\',\''+finalText+'\', \''+email+'\')">Stáhnout PDF</button>';
+            invoiceHTML += '<button class="btn" onclick="generatePDF(\''+villaName+'\', \''+finalText+'\')">Stáhnout PDF</button>';
             if(email) {
                 invoiceHTML += '<button class="btn" onclick="sendEmail(\''+villaName+'\',\''+finalText+'\', \''+email+'\')">Poslat e-mailem</button>';
             }
+            invoiceHTML += '<button class="btn" onclick="openInvoiceInNewTab()">Otevřít fakturu v nové stránce</button>';
             invoiceHTML += '</div>';
+
+            currentInvoiceHTML = invoiceHTML;
 
             document.getElementById('invoiceContainer').innerHTML = invoiceHTML;
         }
 
-        async function generatePDF(villaName, finalText, email) {
+        async function generatePDF(villaName, finalText) {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.text("Faktura", 10, 10);
-            doc.text("Vila: " + villaName, 10, 20);
-            doc.text(finalText, 10, 30);
-            doc.text("Datum: " + new Date().toLocaleDateString(), 10, 40);
-            doc.text("Tato ukázka PDF neobsahuje detailní položky, ale v reálném nasazení by je mohla obsahovat.", 10, 50);
-
-            doc.save("faktura.pdf");
+            const doc = new jsPDF({
+                unit: 'px',
+                format: 'a4'
+            });
+            
+            const invoiceElement = document.getElementById('invoiceContainer');
+            
+            await doc.html(invoiceElement, {
+                html2canvas: { scale: 0.8 },
+                callback: function (doc) {
+                    doc.save("faktura.pdf");
+                },
+                x: 10,
+                y: 10
+            });
         }
 
         function sendEmail(villaName, finalText, email) {
-            // Jednoduchá ukázka - pouze otevře mailto: s předmětem a textem
             const subject = encodeURIComponent("Faktura - " + villaName);
             const body = encodeURIComponent("Dobrý den,\npřikládám fakturu.\n" + finalText);
             window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function openInvoiceInNewTab() {
+            const invoiceWin = window.open('', '_blank');
+            invoiceWin.document.write('<html><head><title>Faktura</title><meta charset="UTF-8"></head><body style="font-family: Arial, sans-serif;">');
+            invoiceWin.document.write(currentInvoiceHTML);
+            invoiceWin.document.write('</body></html>');
+            invoiceWin.document.close();
         }
     </script>
 </body>
