@@ -191,7 +191,7 @@
                 <label for="malibu">Malibu (99 Kč)</label>
                 <input type="number" id="malibu" placeholder="0" min="0">
             </div>
-            <div id="amazing-pool-items">
+            <div id="amazing-pool-items" style="display: none;">
                 <div class="form-group">
                     <label for="coca-cola">Coca-Cola (32 Kč)</label>
                     <input type="number" id="coca-cola" placeholder="0" min="0">
@@ -217,8 +217,6 @@
     </div>
 
     <script>
-        document.getElementById("amazing-pool-items").style.display = "none";
-
         function updateVillaItems() {
             const villa = document.getElementById("villa").value;
             const poolItems = document.getElementById("amazing-pool-items");
@@ -227,13 +225,18 @@
 
         function generateInvoice() {
             const villa = document.getElementById("villa").value;
-            const invoiceContainer = document.getElementById("invoiceContainer");
             const exchangeRate = document.getElementById("exchange-rate").value;
             const guests = document.getElementById("guests").value;
+            const nights = document.getElementById("nights").value;
 
-            let invoiceHTML = `<div class="invoice"><h3>Faktura: ${villa}</h3>`;
-            invoiceHTML += `<div><b>Hosté:</b> ${guests}</div>`;
-            invoiceContainer.innerHTML = invoiceHTML + "</div>";
+            let invoiceHTML = `<div class="invoice">
+                <h3>Faktura</h3>
+                <div class="invoice-item"><span>Vila:</span> <strong>${villa}</strong></div>
+                <div class="invoice-item"><span>Počet hostů:</span> ${guests}</div>
+                <div class="invoice-item"><span>Počet nocí:</span> ${nights}</div>
+                <div class="invoice-item"><span>Kurz:</span> ${exchangeRate} CZK/EUR</div>
+            </div>`;
+            document.getElementById("invoiceContainer").innerHTML = invoiceHTML;
         }
     </script>
 </body>
