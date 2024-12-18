@@ -298,6 +298,7 @@
         <div id="invoiceContainer"></div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         let currentVilla = "oh-yeah";
         let selectedCurrency = "CZK";
@@ -307,7 +308,7 @@
             const extraItems = document.getElementById("extra-items");
             const header = document.getElementById("headerGradient");
 
-            // Aktualizace vily
+            // Nastavení aktuální vily
             currentVilla = villa;
 
             // Zobrazení/skrytí extra položek
@@ -343,6 +344,8 @@
         }
 
         function generateInvoice() {
+            if (!validateInputs()) return;
+
             // Základní údaje
             const guests = parseInt(document.getElementById("guests").value) || 0;
             const nights = parseInt(document.getElementById("nights").value) || 0;
@@ -357,9 +360,6 @@
                 'moscow-mule': { price: 99, label: 'Moscow Mule' },
                 'gin-tonic': { price: 99, label: 'Gin-Tonic' },
                 'mojito': { price: 99, label: 'Mojito' },
-                'coca-cola': { price: 32, label: 'Coca-Cola' },
-                'sprite': { price: 32, label: 'Sprite' },
-                'red-bull': { price: 59, label: 'Red Bull' },
                 'prosecco': { price: 390, label: 'Prosecco' }
             };
 
@@ -370,7 +370,7 @@
                 'gas': { price: 12, label: 'Plyn' }
             };
 
-            // Inicializace celkových sum
+            // Celkové hodnoty
             let totalCZK = 0;
             let itemsHtml = '';
 
@@ -388,3 +388,104 @@
                                 formatNumber(itemTotal, "CZK") : 
                                 formatNumber(eurValue, "EUR")}</span>
                         </div>`;
+                }
+            }
+
+            // Zpracování nealko položek pro Amazing Pool
+            if (currentVilla === "amazing-pool") {
+                const nonAlcoholicItems = {
+                    'coca-cola': { price: 32, label: 'Coca-Cola' },
+                    'sprite': { price: 32, label: 'Sprite' },
+                    'red-bull': { price: 59, label: 'Red Bull' }
+                };
+
+                for (const [id, item] of Object.entries(nonAlcoholicItems)) {
+                    const quantity = parseInt(document.getElementById(id)?.value) || 0;
+                    if (quantity > 0) {
+                        const itemTotal = quantity * item.price;
+                        totalCZK += itemTotal;
+                        const eurValue = itemTotal / exchangeRate;
+                        itemsHtml += `
+                            <div class="invoice-item purchased">
+                                <span>${item.label} (${quantity}x)</span>
+                                <span>${selectedCurrency === "CZK" ? 
+                                    formatNumber(itemTotal, "CZK") : 
+                                    formatNumber(eurValue, "EUR")}</span>
+                            </div>`;
+                    }
+                }
+            }
+
+            // Zpracování EUR položek
+            let totalEUR = 0;
+            for (const [id, item] of Object.entries(eurItems)) {
+                const quantity = parseInt(document.getElementById(id)?.value) || 0;
+                if (quantity > 0) {
+                    const itemTotal = quantity * item.price;
+                    totalEUR += itemTotal;
+                    const czkValue = itemTotal * exchangeRate;
+                    itemsHtml += `
+                        <div class="invoice-item purchased">
+                            <span>${item.label} (${quantity}x)</span>
+                            <span>${selectedCurrency === "CZK" ? 
+                                formatNumber(czkValue, "CZK") : 
+                                formatNumber(itemTotal, "EUR")}</span>
+                        </div>`;
+                }
+            }
+
+            // Přidání městské daně
+            const cityTaxTotal = selectedCurrency === "CZK" ? cityTax : cityTax / exchangeRate;
+            itemsHtml += `
+                <div class="invoice-item purchased">
+                    <span>Městská daň (${guests} hostů x ${nights} nocí)</span>
+                    <span>${formatNumber(cityTaxTotal, selectedCurrency)}</span>
+                </div>`;
+
+            // Celkové hodnoty
+            const grandTotal = selectedCurrency === "CZK" ? 
+                totalCZK + (totalEUR * exchangeRate) + cityTax : 
+                (totalCZK / exchangeRate) + totalEUR + (cityTax / exchangeRate);
+
+            // HTML faktury
+            const invoiceHtml = `
+                <div class="invoice" id="invoiceElement">
+                    <div class="invoice-header">
+                        <div><strong>Faktura</strong><br>${getCurrentDate()}</div>
+                        <div><strong>Vila:</strong> ${currentVilla.replace('-', ' ').toUpperCase()}</div>
+                    </div>
+                    <div class="invoice-items">
+                        ${itemsHtml}
+                    </div>
+                    <div class="invoice-total">
+                        Celkem: ${formatNumber(grandTotal, selectedCurrency)}
+                    </div>
+                </div>`;
+
+            document.getElementById("invoiceContainer").innerHTML = invoiceHtml;
+        }
+
+        function validateInputs() {
+            const exchangeRate = parseFloat(document.getElementById("exchange-rate").value);
+            if (isNaN(exchangeRate) || exchangeRate <= 0) {
+                alert("Prosím, zadejte platný kurz CZK/EUR.");
+                return false;
+            }
+            return true;
+        }
+
+        function exportToJPEG() {
+            const invoiceElement = document.getElementById("invoiceElement");
+            html2canvas(invoiceElement).then(canvas => {
+                const link = document.createElement("a");
+                link.download = `faktura_${getCurrentDate().replace(/\./g, "-")}.jpeg`; // Název souboru
+                link.href = canvas.toDataURL("image/jpeg");
+                link.click();
+            }).catch(error => {
+                console.error("Chyba při generování JPEG:", error);
+                alert("Nepodařilo se uložit fakturu jako JPEG.");
+            });
+        }
+    </script>
+</body>
+</html>
