@@ -191,6 +191,22 @@
                 <label for="malibu">Malibu (99 Kč)</label>
                 <input type="number" id="malibu" placeholder="0" min="0">
             </div>
+            <div class="form-group">
+                <label for="jack-cola">Jack s colou (99 Kč)</label>
+                <input type="number" id="jack-cola" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+                <label for="moscow-mule">Moscow Mule (99 Kč)</label>
+                <input type="number" id="moscow-mule" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+                <label for="gin-tonic">Gin-Tonic (99 Kč)</label>
+                <input type="number" id="gin-tonic" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+                <label for="mojito">Mojito (99 Kč)</label>
+                <input type="number" id="mojito" placeholder="0" min="0">
+            </div>
             <div id="amazing-pool-items" style="display: none;">
                 <div class="form-group">
                     <label for="coca-cola">Coca-Cola (32 Kč)</label>
@@ -205,39 +221,20 @@
                     <input type="number" id="red-bull" placeholder="0" min="0">
                 </div>
             </div>
-
             <div class="form-group">
-                <label for="email">E-mail pro odeslání faktury:</label>
-                <input type="email" id="email" placeholder="Zadejte email">
+                <label for="prosecco">Prosecco (390 Kč)</label>
+                <input type="number" id="prosecco" placeholder="0" min="0">
             </div>
 
-            <button class="btn" onclick="generateInvoice()">Generovat fakturu</button>
-            <div id="invoiceContainer"></div>
-        </div>
-    </div>
-
-    <script>
-        function updateVillaItems() {
-            const villa = document.getElementById("villa").value;
-            const poolItems = document.getElementById("amazing-pool-items");
-            poolItems.style.display = villa === "amazing-pool" ? "block" : "none";
-        }
-
-        function generateInvoice() {
-            const villa = document.getElementById("villa").value;
-            const exchangeRate = document.getElementById("exchange-rate").value;
-            const guests = document.getElementById("guests").value;
-            const nights = document.getElementById("nights").value;
-
-            let invoiceHTML = `<div class="invoice">
-                <h3>Faktura</h3>
-                <div class="invoice-item"><span>Vila:</span> <strong>${villa}</strong></div>
-                <div class="invoice-item"><span>Počet hostů:</span> ${guests}</div>
-                <div class="invoice-item"><span>Počet nocí:</span> ${nights}</div>
-                <div class="invoice-item"><span>Kurz:</span> ${exchangeRate} CZK/EUR</div>
-            </div>`;
-            document.getElementById("invoiceContainer").innerHTML = invoiceHTML;
-        }
-    </script>
-</body>
-</html>
+            <div class="section-title">Položky v EUR</div>
+            <div class="form-group">
+                <label for="beer-30l">Pivo sud 30 l (125 €)</label>
+                <input type="number" id="beer-30l" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+                <label for="beer-50l">Pivo sud 50 l (175 €)</label>
+                <input type="number" id="beer-50l" placeholder="0" min="0">
+            </div>
+            <div class="form-group">
+                <label for="gas">Plyn (12 €)</label>
+                <input type="
