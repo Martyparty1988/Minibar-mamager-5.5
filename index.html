@@ -199,8 +199,26 @@
                 <input type="number" id="gas" placeholder="0" min="0">
             </div>
             <div class="form-group">
-                <label
+                <label for="wellness">Wellness (€)</label>
+                <input type="number" id="wellness" placeholder="Cena zadaná uživatelem" min="0">
+            </div>
 
- * https://www.codemag.com/Article/2111092/Blazor-Hybrid-Web-Apps-with-.NET-MAUI
- * https://github.com/ManthanCitrusbug/HTML-CSS-Learning
- * https://github.com/jonfranco224/devlecture
+            <button class="btn" onclick="generateInvoice()">Generovat fakturu</button>
+            <div id="invoiceContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        function updateVillaSettings() {
+            const villa = document.getElementById("villa").value;
+            const appContainer = document.getElementById("appContainer");
+            const amazingPoolItems = document.getElementById("amazing-pool-items");
+
+            if (villa === "oh-yeah") {
+                appContainer.style.backgroundColor = "var(--oh-yeah-bg)";
+                amazingPoolItems.style.display = "none";
+            } else if (villa === "little-castle") {
+                appContainer.style.backgroundColor = "var(--little-castle-bg)";
+                amazingPoolItems.style.display = "none";
+            } else if (villa === "amazing-pool") {
+                appContainer.style.backgroundColor = "var(--amazing-p
