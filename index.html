@@ -21,15 +21,16 @@
         }
 
         html, body {
-            height: 100%;
             background-color: var(--background-color);
-            overscroll-behavior-y: none;
+        }
+
+        body {
+            overflow-y: scroll;
         }
 
         .app-container {
             max-width: 600px;
             margin: 0 auto;
-            height: 100vh;
             display: flex;
             flex-direction: column;
             background-color: white;
@@ -44,6 +45,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         .logo {
@@ -70,8 +74,6 @@
         }
 
         .content {
-            flex-grow: 1;
-            overflow-y: auto;
             padding: 20px;
         }
 
@@ -175,6 +177,7 @@
             </div>
 
             <div class="section-title">Položky v CZK</div>
+            <!-- Položky v CZK: Budvar, Malibu, Jack s colou, Moscow Mule, Gin-Tonic, Mojito, Coca-Cola, Sprite, Red Bull, Prosecco -->
             <div class="form-group">
                 <label for="budvar">Budvar (59 Kč)</label>
                 <input type="number" id="budvar" placeholder="0" min="0">
@@ -217,6 +220,7 @@
             </div>
 
             <div class="section-title">Položky v EUR</div>
+            <!-- Položky v EUR: Pivo sud 30l, Pivo sud 50l, Plyn, Wellness -->
             <div class="form-group">
                 <label for="beer-30l">Pivo sud 30l (125 €)</label>
                 <input type="number" id="beer-30l" placeholder="0" min="0">
@@ -234,6 +238,11 @@
                 <input type="number" id="wellness" placeholder="0" min="0">
             </div>
 
+            <div class="form-group">
+                <label for="email">E-mail pro odeslání faktury:</label>
+                <input type="email" id="email" placeholder="Zadejte email">
+            </div>
+
             <button class="btn" onclick="generateInvoice()">Generovat fakturu</button>
             <div id="invoiceContainer"></div>
         </div>
@@ -245,11 +254,11 @@
             const villa = document.getElementById('villa').value;
             const appContainer = document.getElementById('appContainer');
             if (villa === 'oh-yeah') {
-                appContainer.style.backgroundColor = '#FFC0CB'; 
+                appContainer.style.backgroundColor = '#FFC0CB'; // růžová
             } else if (villa === 'little-castle') {
-                appContainer.style.backgroundColor = '#ADD8E6'; 
+                appContainer.style.backgroundColor = '#ADD8E6'; // světle modrá
             } else if (villa === 'amazing-pool') {
-                appContainer.style.backgroundColor = '#90EE90'; 
+                appContainer.style.backgroundColor = '#90EE90'; // světle zelená
             }
         }
 
@@ -257,7 +266,8 @@
             const exchangeRate = parseFloat(document.getElementById('exchange-rate').value);
             const guests = parseInt(document.getElementById('guests').value,10);
             const nights = parseInt(document.getElementById('nights').value,10);
-            const villaName = document.getElementById('villa').options[document.getElementById('villa').selectedIndex].text;
+            const villaName = document.getElementById('villa').value;
+            const email = document.getElementById('email').value;
 
             // Položky v CZK
             const czkItems = [
@@ -292,36 +302,30 @@
             eurItems.forEach(item => {
                 const qty = parseInt(document.getElementById(item.id).value,10) || 0;
                 if(item.priceVariable) {
-                    totalEUR += qty; 
+                    // wellness zadána přímo hodnota v EUR
+                    totalEUR += qty;
                 } else {
                     totalEUR += qty * item.price;
                 }
             });
 
-            let convert = prompt("Zadejte 'EUR' pro převod do eur, nebo 'CZK' pro převod do korun:", "EUR");
-            let finalAmountText = "";
+            let convertChoice = prompt("Napište 'EUR' pokud chcete převést vše do EUR, nebo 'CZK' pokud chcete převést vše do CZK:");
             let finalAmount = 0;
-            let finalCurrency = "";
-
-            if(convert && convert.toUpperCase() === "EUR") {
+            let finalText = "";
+            if(convertChoice && convertChoice.toUpperCase() === 'EUR') {
                 const czkInEur = totalCZK / exchangeRate;
                 finalAmount = czkInEur + totalEUR;
-                finalAmountText = "Celková částka: " + finalAmount.toFixed(2) + " EUR";
-                finalCurrency = "EUR";
+                finalText = "Celková částka: " + finalAmount.toFixed(2) + " EUR";
             } else {
                 const eurInCzk = totalEUR * exchangeRate;
                 finalAmount = totalCZK + eurInCzk;
-                finalAmountText = "Celková částka: " + finalAmount.toFixed(2) + " CZK";
-                finalCurrency = "CZK";
+                finalText = "Celková částka: " + finalAmount.toFixed(2) + " CZK";
             }
 
-            let now = new Date();
-            let dateStr = now.getDate()+"."+(now.getMonth()+1)+"."+now.getFullYear();
-
-            // Vygenerujeme HTML faktury
             let invoiceHTML = '<div class="invoice">';
-            invoiceHTML += '<h3>Faktura - '+villaName+'</h3>';
-            invoiceHTML += '<div class="invoice-item"><span>Datum: '+dateStr+'</span></div>';
+            invoiceHTML += '<h3>Faktura</h3>';
+            invoiceHTML += '<div class="invoice-item"><span>Vila: '+villaName+'</span></div>';
+            invoiceHTML += '<div class="invoice-item"><span>Datum: '+new Date().toLocaleDateString()+'</span></div>';
             invoiceHTML += '<div class="invoice-item"><span>Počet hostů: '+guests+'</span></div>';
             invoiceHTML += '<div class="invoice-item"><span>Počet nocí: '+nights+'</span></div>';
 
@@ -350,31 +354,34 @@
                 }
             });
 
-            invoiceHTML += '<div class="invoice-total">'+finalAmountText+'</div>';
-            invoiceHTML += '<button class="btn" onclick="generatePDF(\''+villaName+'\',\''+dateStr+'\','+finalAmount.toFixed(2)+',\''+finalCurrency+'\')">Stáhnout PDF</button>';
-            invoiceHTML += '<button class="btn" onclick="sendEmail(\''+villaName+'\',\''+dateStr+'\','+finalAmount.toFixed(2)+',\''+finalCurrency+'\')">Poslat emailem</button>';
+            invoiceHTML += '<div class="invoice-total">'+finalText+'</div>';
+            invoiceHTML += '<button class="btn" onclick="generatePDF(\''+villaName+'\',\''+finalText+'\', \''+email+'\')">Stáhnout PDF</button>';
+            if(email) {
+                invoiceHTML += '<button class="btn" onclick="sendEmail(\''+villaName+'\',\''+finalText+'\', \''+email+'\')">Poslat e-mailem</button>';
+            }
             invoiceHTML += '</div>';
 
             document.getElementById('invoiceContainer').innerHTML = invoiceHTML;
         }
 
-        async function generatePDF(villaName, dateStr, amount, currency) {
+        async function generatePDF(villaName, finalText, email) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            doc.setFontSize(14);
-            doc.text("Faktura - " + villaName, 10, 10);
-            doc.text("Datum: " + dateStr, 10, 20);
-            doc.text("Celková částka: " + amount.toFixed(2) + " " + currency, 10, 30);
+            doc.text("Faktura", 10, 10);
+            doc.text("Vila: " + villaName, 10, 20);
+            doc.text(finalText, 10, 30);
+            doc.text("Datum: " + new Date().toLocaleDateString(), 10, 40);
+            doc.text("Tato ukázka PDF neobsahuje detailní položky, ale v reálném nasazení by je mohla obsahovat.", 10, 50);
 
             doc.save("faktura.pdf");
         }
 
-        function sendEmail(villaName, dateStr, amount, currency) {
-            let email = prompt("Zadejte emailovou adresu:");
-            if(email) {
-                alert("Faktura z vily "+villaName+" dne "+dateStr+" o částce "+amount.toFixed(2)+" "+currency+" by byla odeslána na "+email+". (Tady by byl reálný proces odesílání emailu)");
-            }
+        function sendEmail(villaName, finalText, email) {
+            // Jednoduchá ukázka - pouze otevře mailto: s předmětem a textem
+            const subject = encodeURIComponent("Faktura - " + villaName);
+            const body = encodeURIComponent("Dobrý den,\npřikládám fakturu.\n" + finalText);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
         }
     </script>
 </body>
