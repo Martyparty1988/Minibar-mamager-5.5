@@ -11,6 +11,7 @@
             --oh-yeah-bg: #FFC0CB;
             --little-castle-bg: #ADD8E6;
             --amazing-pool-bg: #90EE90;
+            --btn-hover-color: #008080;
         }
 
         * {
@@ -26,10 +27,10 @@
         }
 
         .app-container {
-            max-width: 600px;
+            max-width: 700px;
             margin: auto;
             background-color: white;
-            border-radius: 8px;
+            border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
@@ -39,10 +40,23 @@
             padding: 20px;
             background-color: var(--primary-color);
             color: white;
+            font-size: 24px;
+            font-weight: bold;
         }
 
         .content {
             padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
         }
 
         .form-group {
@@ -52,59 +66,84 @@
         .form-group label {
             display: block;
             font-weight: bold;
+            margin-bottom: 5px;
         }
 
         .form-group input,
         .form-group select {
             width: 100%;
-            padding: 8px;
-            margin-top: 5px;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
         }
 
         .btn {
             display: block;
             width: 100%;
-            padding: 10px;
+            padding: 15px;
+            font-size: 18px;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         .btn:hover {
-            background-color: var(--secondary-color);
+            background-color: var(--btn-hover-color);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .invoice {
             margin-top: 20px;
-            padding: 15px;
-            background-color: #f7f7f7;
-            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
         .invoice h3 {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
         }
 
         .invoice-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
 
         .invoice-total {
             font-weight: bold;
             text-align: right;
             margin-top: 15px;
+            font-size: 18px;
         }
 
         @media screen and (max-width: 600px) {
             body {
                 padding: 10px;
+            }
+
+            .form-row {
+                flex-direction: column;
             }
 
             .app-container {
@@ -120,30 +159,44 @@
 <body>
     <div class="app-container">
         <div class="header">
-            <h1>K&D Minibar Management</h1>
+            K&D Minibar Management
         </div>
         <div class="content">
-            <div class="form-group">
-                <label for="villa">Výběr vily</label>
-                <select id="villa" onchange="updateVilla()">
-                    <option value="oh-yeah">OH YEAH VILLA</option>
-                    <option value="little-castle">LITTLE CASTLE</option>
-                    <option value="amazing-pool">AMAZING POOL</option>
-                </select>
+            <div class="section">
+                <div class="section-title">Výběr vily</div>
+                <div class="form-group">
+                    <label for="villa">Vyberte vilu</label>
+                    <select id="villa" onchange="updateVilla()">
+                        <option value="oh-yeah">OH YEAH VILLA</option>
+                        <option value="little-castle">LITTLE CASTLE</option>
+                        <option value="amazing-pool">AMAZING POOL</option>
+                    </select>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="guests">Počet hostů</label>
-                <input type="number" id="guests" placeholder="Počet hostů" min="1">
+            <div class="section">
+                <div class="section-title">Počet hostů a nocí</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="guests">Počet hostů</label>
+                        <input type="number" id="guests" placeholder="Počet hostů" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="nights">Počet nocí</label>
+                        <input type="number" id="nights" placeholder="Počet nocí" min="1">
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="nights">Počet nocí</label>
-                <input type="number" id="nights" placeholder="Počet nocí" min="1">
+            <div class="section">
+                <div class="section-title">Kurz měny</div>
+                <div class="form-group">
+                    <label for="exchange-rate">Kurz (CZK/EUR)</label>
+                    <input type="number" id="exchange-rate" placeholder="Zadejte kurz">
+                </div>
             </div>
-            <div class="form-group">
-                <label for="exchange-rate">Kurz (CZK/EUR)</label>
-                <input type="number" id="exchange-rate" placeholder="Zadejte kurz">
+            <div class="section">
+                <div class="section-title">Položky</div>
+                <div id="items-container"></div>
             </div>
-            <div id="items-container"></div>
             <div class="form-group">
                 <button class="btn" onclick="generateInvoice()">Vygenerovat fakturu</button>
             </div>
