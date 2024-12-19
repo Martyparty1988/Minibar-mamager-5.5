@@ -8,9 +8,9 @@
         :root {
             --primary-color: #007BFF;
             --secondary-color: #00C6AE;
-            --oh-yeah-bg: #F0F8FF;
-            --little-castle-bg: #FAF4EB;
-            --amazing-pool-bg: #E6FAF4;
+            --oh-yeah-bg: #F9E3E3;
+            --little-castle-bg: #F4F4F2;
+            --amazing-pool-bg: #DFF5F2;
             --btn-gradient: linear-gradient(135deg, #007BFF, #00C6AE);
             --btn-hover-gradient: linear-gradient(135deg, #00C6AE, #007BFF);
         }
@@ -302,7 +302,65 @@
             });
         }
 
+        function generateInvoice() {
+            const villa = document.getElementById("villa").value;
+            const guests = parseInt(document.getElementById("guests").value) || 0;
+            const nights = parseInt(document.getElementById("nights").value) || 0;
+            const cityTax = guests * nights * 2;
+
+            let totalCZK = 0, totalEUR = 0;
+            let itemsPurchased = [];
+
+            items[villa].forEach(item => {
+                const count = parseInt(document.getElementById(item.name)?.value) || 0;
+                if (count > 0) {
+                    itemsPurchased.push(`${item.name}: ${count} × ${item.priceCZK ? item.priceCZK + " Kč" : item.priceEUR + " €"}`);
+                }
+                if (item.priceCZK) totalCZK += count * item.priceCZK;
+                if (item.priceEUR) totalEUR += count * item.priceEUR;
+            });
+
+            const invoiceContainer = document.getElementById("invoiceContainer");
+            invoiceContainer.innerHTML = `
+                <div class="invoice">
+                    <h3>Invoice</h3>
+                    <p>Villa: ${villa}</p>
+                    <p>Date: ${new Date().toLocaleDateString()}</p>
+                    <p>Purchased Items:</p>
+                    <ul>
+                        ${itemsPurchased.map(item => `<li>${item}</li>`).join("")}
+                    </ul>
+                    <div class="invoice-item"><span>City Tax:</span><span>${cityTax.toFixed(2)} €</span></div>
+                    <div class="invoice-item"><span>Items Total:</span><span>${totalCZK.toFixed(2)} Kč / ${totalEUR.toFixed(2)} €</span></div>
+                    <div class="invoice-total">Grand Total: ${(totalCZK + totalEUR * 24).toFixed(2)} Kč</div>
+                </div>
+            `;
+        }
+
+        function applyDiscount() {
+            const invoice = document.querySelector(".invoice");
+            if (invoice) {
+                const totalElement = invoice.querySelector(".invoice-total");
+                const totalText = totalElement.textContent.match(/[\d.]+/);
+                const total = parseFloat(totalText[0]) * 0.9;
+                totalElement.textContent = `Grand Total (with 10% Discount): ${total.toFixed(2)} Kč`;
+            }
+        }
+
+        function saveAsImage() {
+            const invoice = document.querySelector(".invoice");
+            if (invoice) {
+                html2canvas(invoice).then(canvas => {
+                    const link = document.createElement("a");
+                    link.download = "invoice.jpeg";
+                    link.href = canvas.toDataURL("image/jpeg");
+                    link.click();
+                });
+            }
+        }
+
         updateVilla();
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
